@@ -4,6 +4,7 @@ permissions:
   contents: read
 jobs:
   build:
+    timeout-minutes: 60
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -13,9 +14,10 @@ jobs:
       - run: python -m pip install uv==0.13.4
       - run: uv sync --frozen --extra full --extra dev
       - run: choco install ffmpeg innosetup --yes --no-progress
-      - run: uv run --no-sync python tools/build_native.py --fetch
+      - name: Build native host and fixture
+        run: uv run --no-sync python tools/build_native.py --fetch
       - run: uv run --no-sync python tools/native_test_environment.py build/native
-      - run: uv run --no-sync python -m pytest -q
+      - run: uv run --no-sync python -m pytest -q --junitxml=artifacts/test-results.xml
       - run: uv run --no-sync python tools/fetch_models.py model-packs
       - run: uv run --no-sync python tools/model_smoke.py model-packs
       - run: uv run --no-sync python tools/build_release.py --target python
@@ -33,7 +35,19 @@ jobs:
         with:
           name: CASSound-testfx
           path: build/native/fixture_bundle/
+      - name: Preserve build diagnostics and test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build-diagnostics
+          if-no-files-found: warn
+          path: |
+            build/native/logs/
+            build/native/CMakeCache.txt
+            build/native/CMakeFiles/CMakeConfigureLog.yaml
+            artifacts/
   verify:
+    timeout-minutes: 30
     needs: build
     runs-on: windows-latest
     steps:
