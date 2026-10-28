@@ -1,0 +1,32 @@
+{
+  "fixture": "one-hour sparse silence WAV; not a representative detector benchmark",
+  "rate": 48000,
+  "channels": 2,
+  "frames": 172800000,
+  "source_bytes": 691200044,
+  "import_seconds": 18.150217828999303,
+  "worker_metrics": {
+    "worker_seconds": 18.020219019999786,
+    "peak_rss_bytes": 749961216
+  },
+  "overview_seconds": 0.10296368600029382,
+  "overview_points": 2637,
+  "science": {
+    "time.metrics": {
+      "seconds": 3.062441089001368,
+      "worker": {
+        "worker_seconds": 2.11849177500153,
+        "peak_rss_bytes": 803651584
+      },
+      "result_id": "result-a876468d6ee907b4ee75f4f97fa44437d786734768819473c245fc6628cb6f68"
+    },
+    "spectral.welch_psd": {
+      "seconds": 4.832976010999118,
+      "worker": {
+        "worker_seconds": 4.599327207999522,
+        "peak_rss_bytes": 821997568
+      },
+      "result_id": "result-d052165178fcee51631959e11eee6d6fa75659ceded37464012c7377f38bc1a1"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cassound"
+version = "1.0.0rc1"
+description = "A sample-aware audio workbench for inspection, reproducible workflows and signal research"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+authors = [{name = "CASSound contributors"}]
+dependencies = ["numpy>=2.2,<3", "soundfile>=0.13,<0.15", "scipy>=1.14,<2", "cryptography>=46,<51"]
+classifiers = ["Operating System :: Microsoft :: Windows", "Topic :: Multimedia :: Sound/Audio :: Analysis", "Programming Language :: Python :: 3"]
+
+[project.optional-dependencies]
+models = ["onnxruntime>=1.23,<2"]
+reports = ["matplotlib>=3.10,<4", "pyarrow>=20,<30"]
+audio = ["sounddevice>=0.5.5,<0.6"]
+desktop = ["PySide6>=6.8,<7", "pyqtgraph>=0.14,<0.15"]
+dev = ["pytest>=8,<10", "ruff>=0.9", "build>=1.2", "pyinstaller>=6.12,<7"]
+features = ["librosa>=0.11,<2", "ssqueezepy>=0.6.6,<0.7", "scikit-learn>=1.5,<2", "pyloudnorm>=0.1.1,<0.3"]
+full = ["cassound[desktop,features,audio,reports,models]"]
+
+[project.scripts]
+cassound = "cassound.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
+[tool.setuptools.package-data]
+cassound = ["resources/*", "resources/model-notices/*/*"]

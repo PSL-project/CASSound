@@ -1,0 +1,15 @@
+........................................................................ [ 55%]
+.........................................................                [100%]
+=============================== warnings summary ===============================
+tests/test_editing.py::test_resampling_and_phasevocoder_pitch_stretch
+tests/test_editing.py::test_resampling_and_phasevocoder_pitch_stretch
+  <workspace>/.venv/lib/python3.12/site-packages/librosa/effects.py:448: FutureWarning: The `hop_length` parameter is deprecated as of 1.0 and will be removed in 1.1. It is unused in the current implementation.
+    stft_stretch = core.phase_vocoder(
+
+tests/test_editing.py::test_resampling_and_phasevocoder_pitch_stretch
+tests/test_editing.py::test_resampling_and_phasevocoder_pitch_stretch
+  <workspace>/.venv/lib/python3.12/site-packages/librosa/effects.py:448: FutureWarning: The `n_fft` parameter is deprecated as of 1.0 and will be removed in 1.1. It is unused in the current implementation.
+    stft_stretch = core.phase_vocoder(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+129 passed, 4 warnings in 343.20s (0:05:43)

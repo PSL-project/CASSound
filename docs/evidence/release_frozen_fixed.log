@@ -1,0 +1,10 @@
+Frozen P3 generation, edit worker and portable render graph passed
+Frozen P3 bundled native VST3 host scan/process passed
+Frozen scientific task passed: spectral.stft
+Frozen scientific task passed: speech.pitch
+Frozen scientific task passed: levels.loudness
+Frozen scientific task passed: transforms.cqt
+Frozen scientific task passed: transforms.synchrosqueezed
+Frozen scientific task passed: music.features
+Frozen scientific task passed: patterns.cluster
+Frozen CLI, isolated child worker, portable project and exact PCM export passed

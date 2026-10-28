@@ -1,0 +1,21 @@
+include LICENSE README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md THIRD_PARTY_NOTICES.md
+include pyproject-note.txt
+recursive-include docs *.md *.csv *.png
+recursive-include tools *.py
+recursive-include packaging *.py *.spec *.json
+recursive-include tests *.py
+recursive-include .github *.yml
+recursive-include benchmarks *.py
+recursive-include docs *.json
+
+include uv.lock
+recursive-include docs *.xml
+
+include NOTICE
+
+recursive-include native *.cpp *.h *.md CMakeLists.txt *.txt
+
+include BUILDING.md
+recursive-include packaging *.iss
+recursive-include tools *.ps1
+recursive-include src/cassound/resources *

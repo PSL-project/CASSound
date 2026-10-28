@@ -1,0 +1,8 @@
+gate,status,evidence
+Media and video stream selection,verified Linux,test_foundation.py and p1-tests.xml
+Exact native PCM and export,verified Linux,test_foundation.py and p1-tests.xml
+Project save open relink,verified Linux,test_foundation.py and p1-tests.xml
+Cancel worker crash and recovery,verified Linux,test_foundation.py and p1-tests.xml
+Shared Python CLI GUI path,verified Linux,tools/gui_smoke.py and tools/verify_frozen.py
+Long-file storage and overview,verified Linux,docs/long-file-result.json
+Native Windows clean-runtime test,pending execution,.github/workflows/windows-build.yml

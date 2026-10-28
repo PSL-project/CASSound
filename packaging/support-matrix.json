@@ -1,0 +1,10 @@
+{
+  "target": "Windows 11 x64",
+  "python_baseline": "3.12",
+  "checkpoint": "1.0.0rc1",
+  "windows_execution": "not_run_in_authoring_environment",
+  "ffmpeg": "external",
+  "native_vst3": "C++17 / SDK 3.8.1 MIT / Windows x64 build recipe; executed Linux fixture and selected mda effects",
+  "audio": "optional sounddevice; actual device/driver qualification pending",
+  "linux_validation": "docs/RELEASE_VALIDATION.md"
+}

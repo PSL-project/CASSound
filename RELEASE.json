@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0rc1",
+  "source_commit": "279056f95159eda5c1b568799fafc98c62dc6794",
+  "tests_passed": 129,
+  "windows_executable_included": false,
+  "validation_record": "docs/RELEASE_VALIDATION.md",
+  "dependencies_and_build": "BUILDING.md",
+  "extension_contract": "docs/EXTENDING.md"
+}

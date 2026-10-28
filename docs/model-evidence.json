@@ -1,0 +1,88 @@
+{
+  "denoise": {
+    "model": {
+      "id": "gtcrn",
+      "repo": "andrelgomes/gtcrn-stream",
+      "revision": "af53b933a7c79c34d488b384c9a8744f1b734395",
+      "file": "gtcrn_simple.onnx",
+      "sha256": "b4718df6228e7bdf1a8a435cf98f838636eb2fd331acabf86ba87c5192ebcb87",
+      "size": 535190,
+      "license": "MIT"
+    },
+    "preprocessing": "Channel mean; polyphase resampling to mono 16000 Hz; CPU",
+    "sample_rate": 16000,
+    "input_frames": 48000
+  },
+  "watermark_insert": {
+    "model": {
+      "id": "audioseal_generator",
+      "repo": "synath/audioseal-onnx",
+      "revision": "aacb1186bedc8118960e5ce8a7849861bf9a4c6c",
+      "file": "audioseal_generator_16bits.onnx",
+      "sha256": "3b3211e0fb4cf513c9da0f4e45d523cf434426902ea9a78a16c68b33d224cf32",
+      "size": 58953817,
+      "license": "MIT"
+    },
+    "preprocessing": "Channel mean; polyphase resampling to mono 16000 Hz; CPU",
+    "sample_rate": 16000,
+    "input_frames": 48000,
+    "message_bits": "0101010101010101",
+    "operation": "AudioSeal watermarked output, 16-bit known-family profile."
+  },
+  "watermark_roundtrip": {
+    "model": {
+      "id": "audioseal_detector",
+      "repo": "synath/audioseal-onnx",
+      "revision": "aacb1186bedc8118960e5ce8a7849861bf9a4c6c",
+      "file": "audioseal_detector_16bits.onnx",
+      "sha256": "3ff3991c4bf4426c5aed8b122610833cb4cd7e02535d6edeae6380199f809ca2",
+      "size": 34759744,
+      "license": "MIT"
+    },
+    "preprocessing": "Channel mean; polyphase resampling to mono 16000 Hz; CPU",
+    "sample_rate": 16000,
+    "input_frames": 48000,
+    "watermark_score": 0.9999918341636658,
+    "candidate": true,
+    "message_bits": "0101010101010101",
+    "interpretation": "Known AudioSeal family; payload is meaningful only with detection. Not a universal detector or authenticity verdict."
+  },
+  "unmarked_synthetic_control": {
+    "model": {
+      "id": "audioseal_detector",
+      "repo": "synath/audioseal-onnx",
+      "revision": "aacb1186bedc8118960e5ce8a7849861bf9a4c6c",
+      "file": "audioseal_detector_16bits.onnx",
+      "sha256": "3ff3991c4bf4426c5aed8b122610833cb4cd7e02535d6edeae6380199f809ca2",
+      "size": 34759744,
+      "license": "MIT"
+    },
+    "preprocessing": "Channel mean; polyphase resampling to mono 16000 Hz; CPU",
+    "sample_rate": 16000,
+    "input_frames": 48000,
+    "watermark_score": 0.005492798052728176,
+    "candidate": false,
+    "message_bits": "0111110101110101",
+    "interpretation": "Known AudioSeal family; payload is meaningful only with detection. Not a universal detector or authenticity verdict."
+  },
+  "deepfake_execution": {
+    "model": {
+      "id": "deepfake",
+      "repo": "pranjal-pravesh/wav2vec2-large-xlsr-deepfake-audio-classification",
+      "revision": "4b1c4a294ab68ab444dac038fec8e8da2cc1982f",
+      "file": "model_int8.onnx",
+      "sha256": "7af799e8443c3d030bb3ef644ffc6e74f5b6fddcd6a4286ee9abe9e828cb762e",
+      "size": 355336130,
+      "license": "Apache-2.0"
+    },
+    "preprocessing": "Channel mean; polyphase resampling to mono 16000 Hz; CPU",
+    "sample_rate": 16000,
+    "input_frames": 48000,
+    "chunk_fake_scores": [
+      0.2722001075744629
+    ],
+    "mean_fake_score": 0.2722001075744629,
+    "interpretation": "Uncalibrated model scores, not authenticity probabilities. Unseen-source field accuracy is not established."
+  },
+  "limits": "Synthetic execution evidence, not listening quality, unseen-source deepfake accuracy or population false-positive calibration."
+}

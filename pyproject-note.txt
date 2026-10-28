@@ -1,0 +1,1 @@
+The Python distribution name cassound is provisional until namespace availability is checked before public PyPI publication. This checkpoint installs from source or the supplied wheel; no public upload has been performed.

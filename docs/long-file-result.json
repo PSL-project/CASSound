@@ -1,0 +1,14 @@
+{
+  "fixture": "one-hour sparse silence WAV; not a representative detector benchmark",
+  "rate": 48000,
+  "channels": 2,
+  "frames": 172800000,
+  "source_bytes": 691200044,
+  "import_seconds": 17.18127477500002,
+  "worker_metrics": {
+    "worker_seconds": 17.05382301999998,
+    "peak_rss_bytes": 749002752
+  },
+  "overview_seconds": 0.11844382599974779,
+  "overview_points": 2637
+}
