@@ -1,0 +1,38 @@
+[
+  {
+    "id": "gtcrn",
+    "repo": "andrelgomes/gtcrn-stream",
+    "revision": "af53b933a7c79c34d488b384c9a8744f1b734395",
+    "file": "gtcrn_simple.onnx",
+    "sha256": "b4718df6228e7bdf1a8a435cf98f838636eb2fd331acabf86ba87c5192ebcb87",
+    "size": 535190,
+    "license": "MIT"
+  },
+  {
+    "id": "audioseal_generator",
+    "repo": "synath/audioseal-onnx",
+    "revision": "aacb1186bedc8118960e5ce8a7849861bf9a4c6c",
+    "file": "audioseal_generator_16bits.onnx",
+    "sha256": "3b3211e0fb4cf513c9da0f4e45d523cf434426902ea9a78a16c68b33d224cf32",
+    "size": 58953817,
+    "license": "MIT"
+  },
+  {
+    "id": "audioseal_detector",
+    "repo": "synath/audioseal-onnx",
+    "revision": "aacb1186bedc8118960e5ce8a7849861bf9a4c6c",
+    "file": "audioseal_detector_16bits.onnx",
+    "sha256": "3ff3991c4bf4426c5aed8b122610833cb4cd7e02535d6edeae6380199f809ca2",
+    "size": 34759744,
+    "license": "MIT"
+  },
+  {
+    "id": "deepfake",
+    "repo": "pranjal-pravesh/wav2vec2-large-xlsr-deepfake-audio-classification",
+    "revision": "4b1c4a294ab68ab444dac038fec8e8da2cc1982f",
+    "file": "model_int8.onnx",
+    "sha256": "7af799e8443c3d030bb3ef644ffc6e74f5b6fddcd6a4286ee9abe9e828cb762e",
+    "size": 355336130,
+    "license": "Apache-2.0"
+  }
+]
