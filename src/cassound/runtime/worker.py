@@ -9,6 +9,11 @@ from ..domain.errors import CASSoundError
 
 
 def main():
+    # Parent pipe encoding does not configure the child interpreter on Windows.
+    # This must also work for frozen workers and non-UTF-8 console locales.
+    for stream in (sys.stdin, sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="strict")
     started = time.monotonic()
     last = [0.0]
 

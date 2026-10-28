@@ -121,6 +121,8 @@ class JobManager:
                 else {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW}
             )
             env = os.environ.copy()
+            env["PYTHONIOENCODING"] = "utf-8"
+            env["PYTHONUTF8"] = "1"
             # Bound BLAS threads in each worker; no GUI initialization in children.
             env["SSQ_PARALLEL"] = "0"
             env["NUMBA_NUM_THREADS"] = "1"

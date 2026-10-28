@@ -1,5 +1,6 @@
 """Local media adapter, bounded decode, exact native PCM and display envelopes."""
 
+from contextlib import ExitStack
 import json
 import math
 import os
@@ -13,7 +14,7 @@ import soundfile as sf
 
 from ..domain.errors import BackendUnavailable, ValidationError, IntegrityError, ResourceLimit, CASSoundError
 from ..domain.units import normalized
-from .cache import Cache, cache_key, digest_file, atomic_json
+from .cache import Cache, cache_key, digest_file, atomic_json, mapped_array
 
 BLOCK = 65536
 FORMAT_ALLOWLIST = "wav,flac,aiff,mp3,mov,matroska,webm,ogg,asf,aac,avi,ape,wv,au,caf"
@@ -244,59 +245,55 @@ def _import_audio(path, stream_index, root, stage, limits, progress):
     cache.admit(size * 1.2 + 1024**2)
     output = stage / "cache-entry"
     output.mkdir()
-    data = np.lib.format.open_memmap(
-        output / "samples.npy", mode="w+", dtype=dtype, shape=(info.frames, info.channels)
-    )
-    envelopes = np.lib.format.open_memmap(
-        output / "envelope-256.npy",
-        mode="w+",
-        dtype="float64",
-        shape=(math.ceil(info.frames / 256), info.channels, 2),
-    )
-    with sf.SoundFile(source) as file:
-        for start in range(0, info.frames, BLOCK):
-            block = native_block(file, min(BLOCK, info.frames - start), info.subtype)
-            if not len(block):
-                raise IntegrityError("Unexpected end of decoded stream.")
-            data[start : start + len(block)] = block
-            values = normalized(block, kind, bits)
-            if not np.isfinite(values).all():
-                raise ValidationError("Audio contains non-finite sample values.")
-            # Level zero: exact extrema per 256 source frames (BLOCK is aligned).
-            for off in range(0, len(values), 256):
-                part = values[off : off + 256]
-                envelopes[(start + off) // 256] = np.stack([part.min(axis=0), part.max(axis=0)], axis=-1)
-            progress("cache", (start + len(block)) / info.frames)
-    data.flush()
-    del data
-    # Verify no source changed while decoding. Cache reads thereafter are immutable snapshots.
-    if digest_file(path) != digest:
-        raise IntegrityError("Source changed during import; no asset was registered.")
-    envelopes.flush()
-    level = envelopes
-    step = 256
-    while len(level) > 1:
-        next_level = np.lib.format.open_memmap(
-            output / f"envelope-{step * 2}.npy",
-            mode="w+",
-            dtype="float64",
-            shape=(math.ceil(len(level) / 2), info.channels, 2),
+    with ExitStack() as mappings:
+        data = mappings.enter_context(
+            mapped_array(output / "samples.npy", mode="w+", dtype=dtype, shape=(info.frames, info.channels))
         )
-        for offset in range(0, len(next_level), BLOCK):
-            end = min(offset + BLOCK, len(next_level))
-            first = level[2 * offset : min(2 * end, len(level)) : 2]
-            second = level[2 * offset + 1 : min(2 * end, len(level)) : 2]
-            if len(second) < len(first):
-                second = np.concatenate([second, first[-1:]], axis=0)
-            next_level[offset:end, :, 0] = np.minimum(first[:, :, 0], second[:, :, 0])
-            next_level[offset:end, :, 1] = np.maximum(first[:, :, 1], second[:, :, 1])
-        next_level.flush()
-        level = next_level
-        step *= 2
-    # Windows disallows renaming directories with open mmap handles.
-    del envelopes, level
-    if "next_level" in locals():
-        del next_level, first, second
+        envelopes = mappings.enter_context(
+            mapped_array(
+                output / "envelope-256.npy",
+                mode="w+",
+                dtype="float64",
+                shape=(math.ceil(info.frames / 256), info.channels, 2),
+            )
+        )
+        with sf.SoundFile(source) as file:
+            for start in range(0, info.frames, BLOCK):
+                block = native_block(file, min(BLOCK, info.frames - start), info.subtype)
+                if not len(block):
+                    raise IntegrityError("Unexpected end of decoded stream.")
+                data[start : start + len(block)] = block
+                values = normalized(block, kind, bits)
+                if not np.isfinite(values).all():
+                    raise ValidationError("Audio contains non-finite sample values.")
+                for off in range(0, len(values), 256):
+                    part = values[off : off + 256]
+                    envelopes[(start + off) // 256] = np.stack([part.min(axis=0), part.max(axis=0)], axis=-1)
+                progress("cache", (start + len(block)) / info.frames)
+        if digest_file(path) != digest:
+            raise IntegrityError("Source changed during import; no asset was registered.")
+        level = envelopes
+        step = 256
+        while len(level) > 1:
+            next_level = mappings.enter_context(
+                mapped_array(
+                    output / f"envelope-{step * 2}.npy",
+                    mode="w+",
+                    dtype="float64",
+                    shape=(math.ceil(len(level) / 2), info.channels, 2),
+                )
+            )
+            for offset in range(0, len(next_level), BLOCK):
+                end = min(offset + BLOCK, len(next_level))
+                first = level[2 * offset : min(2 * end, len(level)) : 2]
+                second = level[2 * offset + 1 : min(2 * end, len(level)) : 2]
+                if len(second) < len(first):
+                    second = np.concatenate([second, first[-1:]], axis=0)
+                next_level[offset:end, :, 0] = np.minimum(first[:, :, 0], second[:, :, 0])
+                next_level[offset:end, :, 1] = np.maximum(first[:, :, 1], second[:, :, 1])
+            level = next_level
+            step *= 2
+    # Every writable mapping is flushed and closed before publishing the directory.
     ident = cache_key({"source": digest, "stream": index})
     obj = {
         "name": path.name,

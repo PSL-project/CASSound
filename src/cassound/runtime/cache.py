@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import hashlib
 import json
 from pathlib import Path
@@ -67,3 +68,22 @@ def atomic_json(path, data):
         f.flush()
         os.fsync(f.fileno())
     os.replace(tmp, path)
+
+
+@contextmanager
+def mapped_array(path, **options):
+    """Own a writable NPY mapping; no array/view may be used after this scope.
+
+    flush() does not close a mapping. Explicit ownership is needed before a
+    cache directory can be renamed on Windows, including exception paths.
+    """
+    import numpy as np
+
+    array = np.lib.format.open_memmap(path, **options)
+    try:
+        yield array
+    finally:
+        try:
+            array.flush()
+        finally:
+            array._mmap.close()
