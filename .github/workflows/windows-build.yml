@@ -67,6 +67,29 @@ jobs:
         with:
           name: CASSound-model-packs
           path: model-packs/
-      - run: python tools/verify_frozen.py packaged/CASSound/CASSoundCLI.exe --features --p3 --vst3 fixture/cassound-testfx.vst3
-      - run: python tools/verify_release_runtime.py packaged/CASSound/CASSoundCLI.exe --models model-packs
-      - run: packaged/CASSound/CASSound.exe --gui-startup-check
+      - name: Verify scientific-and-native
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force artifacts | Out-Null
+          python tools/verify_frozen.py packaged/CASSound/CASSoundCLI.exe --features --p3 --vst3 fixture/cassound-testfx.vst3 2>&1 | Tee-Object -FilePath artifacts/scientific-and-native.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify reports-and-models
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force artifacts | Out-Null
+          python tools/verify_release_runtime.py packaged/CASSound/CASSoundCLI.exe --models model-packs 2>&1 | Tee-Object -FilePath artifacts/reports-and-models.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify gui-startup
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force artifacts | Out-Null
+          packaged/CASSound/CASSound.exe --gui-startup-check 2>&1 | Tee-Object -FilePath artifacts/gui-startup.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Preserve packaged verification logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-packaged-verification
+          if-no-files-found: warn
+          path: artifacts/
