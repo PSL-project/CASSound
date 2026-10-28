@@ -49,6 +49,8 @@ cassound gui
 
 For reproducible development, install `uv` and use `uv sync --frozen --extra full --extra dev`. For headless use, install the base package without Qt. Optional groups: `desktop`, `audio`, `features`, `models`, `reports`, and `full`. Install FFmpeg/ffprobe separately and place them on PATH for broad media/video import and codec sweeps. Normal use needs neither Rust nor Node.js.
 
+Windows application bundles include **CASSound.exe** for the desktop and **CASSoundCLI.exe** for scripts, with their shared runtime beside them. Keep the bundle intact when using the portable distribution; installing Python is not required for the bundled executables. Offline model packs and FFmpeg remain separate installations.
+
 See [BUILDING.md](BUILDING.md) for wheel, Windows executable, installer and native VST3 build instructions.
 
 ## Start exploring
@@ -103,7 +105,7 @@ Forensic candidates, profile distances and model scores are observations, not au
 
 The VST3 host supports documented mono/stereo offline audio effects with generic parameters/state, latency/tails and crash quarantine. Instruments, sidechains and vendor editor embedding are outside its current host scope. Audio driver support depends on the installed PortAudio backend.
 
-This source bundle is **1.0.0rc1**. Executed Linux checks and outstanding native Windows, device, DPI/accessibility and field-dataset qualification are recorded explicitly in [RELEASE_VALIDATION.md](docs/RELEASE_VALIDATION.md). A Windows build workflow is supplied; a Linux executable must never be presented as a Windows `.exe`.
+This source bundle is **1.0.0rc1**. Executed Linux checks and outstanding native Windows, device, DPI/accessibility and field-dataset qualification are recorded explicitly in [RELEASE_VALIDATION.md](docs/RELEASE_VALIDATION.md). Windows CI builds the executable and installer, then verifies the packaged application on a separate runner. Successful compilation alone is not runtime qualification.
 
 ## Extend and contribute
 

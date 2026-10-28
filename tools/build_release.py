@@ -33,6 +33,10 @@ def main():
             str(root / "packaging" / "desktop.spec"),
         ]
     subprocess.run(command, cwd=root, check=True)
+    if args.target == "desktop":
+        from verify_bundle_layout import verify_sklearn_runtime
+
+        verify_sklearn_runtime(root / "dist" / "CASSound")
 
 
 if __name__ == "__main__":

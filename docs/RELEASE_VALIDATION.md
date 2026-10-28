@@ -34,3 +34,40 @@ Forensic/profile/model outputs are candidates, distances or scores. ENF matching
 These gates remain visible in FEATURES.csv. They must be resolved with real evidence before promoting this candidate to a fully qualified stable Windows release.
 
 Packaging correction: the broad frozen check identified a missing dynamically imported loudness backend. The spec now explicitly includes the optional analysis backends; the corrected frozen check passed STFT, pitch, loudness, CQT, synchrosqueezing, music, clustering, native effect processing, exact PCM and portable graphs. Final frozen GUI startup exited successfully. A focused stereo microscope check confirmed scalar-sample to source-frame navigation.
+
+## Windows runtime packaging correction — 29 October 2026
+
+The supplied Windows verification log passed generation/editing, portable graphs,
+VST3 scan/process, STFT, pitch, loudness, CQT, synchrosqueezing and music features.
+Clustering then failed when scikit-learn tried to load
+`sklearn/.libs/vcomp140.dll`. Inspection of the locked 1.9.1 Windows wheel confirmed
+that `_distributor_init.py` explicitly loads both `vcomp140.dll` and `msvcp140.dll`
+from that directory. This is a missing bundled runtime, not a removed task.
+
+The local hook now collects package-contained libraries at their original paths,
+plus sibling `scikit_learn.libs` libraries and load-order files when present.
+Desktop builds audit installed scikit-learn's wheel manifest against the final
+bundle before producing a successful build result. All scientific/model/plugin
+verification commands remain enabled. Verification logs are retained on failure.
+
+Executed for this correction:
+
+- Six focused regressions passed: three packaging cases, plus the three existing
+  Windows mapping/Unicode regressions. Packaging cases cover both DLL layouts,
+  relocated/missing `vcomp140.dll` and relocated/missing `msvcp140.dll`.
+- The real locked Windows wheel was downloaded and inspected without executing
+  Windows binaries. The real PyInstaller collectors emitted both DLLs with
+  destination `sklearn/.libs`.
+- A fresh Linux PyInstaller desktop/CLI build passed all seven frozen scientific
+  tasks (including `patterns.cluster`), generation/editing, portable projects,
+  isolated workers and exact PCM export outside the checkout.
+- The freshly built CLI passed encrypted QPSK payload recovery and SVG, PNG, PDF,
+  HTML and Parquet exports. Frozen GUI startup returned exit 0.
+- Python wheel/sdist builds succeeded; the source archive contains the hook and
+  bundle auditor. Ruff and diff whitespace checks passed.
+
+No feature was removed or disabled. This correction was not executed on a native
+Windows runner locally. A new Windows workflow run on the corrected commit must
+validate the rebuilt bundle; rerunning only verification against an old artifact
+cannot pick up this source fix. CPU models and the native VST3 host were not
+rebuilt or retested in this local packaging correction.

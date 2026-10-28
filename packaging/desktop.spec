@@ -20,7 +20,7 @@ if host:
     licenses=path.parent/'licenses'
     if not licenses.is_dir():raise RuntimeError('Native host licenses are required')
     data.extend((str(p),'cassound/native/licenses') for p in licenses.glob('*.txt'))
-a=Analysis([str(root/'packaging/launch.py')],pathex=[str(root/'src')],binaries=native,datas=data,hiddenimports=hidden,excludes=['PySide6.QtWebEngineCore','PySide6.QtWebEngineWidgets','PySide6.QtQml','PySide6.QtQuick'],noarchive=False)
+a=Analysis([str(root/'packaging/launch.py')],pathex=[str(root/'src')],binaries=native,datas=data,hiddenimports=hidden,hookspath=[str(root/'packaging/hooks')],excludes=['PySide6.QtWebEngineCore','PySide6.QtWebEngineWidgets','PySide6.QtQml','PySide6.QtQuick'],noarchive=False)
 pyz=PYZ(a.pure)
 icon=str(root/'src/cassound/resources/cassound.ico')
 gui=EXE(pyz,a.scripts,[],exclude_binaries=True,name='CASSound',icon=icon,console=False,upx=False)
