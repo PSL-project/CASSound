@@ -51,3 +51,10 @@ This is an explicit network step. Fetches are revision/digest pinned and include
 `pytest` exercises numerical/source/security/workflow checks. Optional native tests need the host and fixture environment variables. `tools/model_smoke.py` executes real weights, separately from the ordinary suite. `tools/gui_release_smoke.py` checks workspace startup/themes and writes a screenshot; `tools/verify_frozen.py` covers existing frozen-core paths. `.github/workflows/windows-build.yml` builds native Windows artifacts and runs them on a separate runner. These workflow definitions do not imply they already ran successfully.
 
 The evidence and outstanding qualification are in `docs/RELEASE_VALIDATION.md`. Benchmark datasets, signing credentials, physical device tests and clean Windows execution cannot be replaced by synthetic unit checks.
+
+
+## Native build diagnostics
+
+The Windows native build uses the same static MSVC CRT (`/MT`, `/MTd` for Debug) in CASSound and the VST3 SDK. The host disables Windows `min`/`max` macros with `NOMINMAX` so standard-library calls compile normally.
+
+CMake configure/build output is streamed to the console and saved in `build/native/logs/configure.log` and `build/native/logs/build.log`. A failure includes its first compiler/linker diagnostic in the traceback. Both workflows preserve these files and the CMake cache/configuration log as diagnostic artifacts even when later steps fail. Core checks keeps Linux and Windows matrix jobs independent, so one failure does not cancel the other.

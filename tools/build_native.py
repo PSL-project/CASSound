@@ -1,6 +1,8 @@
 """Build the isolated native host from pinned MIT sources. No plugin is loaded during build."""
 
 import argparse
+import re
+import shlex
 from pathlib import Path
 import shutil
 import subprocess
@@ -10,8 +12,42 @@ SDK_REV = "3cdf9ca5d1f5b1b21e0a86832aa4abe55607bd96"
 JSON_REV = "55f93686c01528224f448c19128836e7df245f72"
 
 
-def run(parts, **kw):
-    subprocess.run([str(x) for x in parts], check=True, **kw)
+def run(parts, *, log_path=None, **kw):
+    command = [str(x) for x in parts]
+    if log_path is None:
+        return subprocess.run(command, check=True, **kw)
+    log_path = Path(log_path)
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    first_error = None
+    diagnostic = re.compile(
+        r"fatal error|error (?:C[0-9]{4}|LNK[0-9]{4}|MSB[0-9]{4})|undefined reference|error:", re.IGNORECASE
+    )
+    print("Native command: " + shlex.join(command), flush=True)
+    with log_path.open("w", encoding="utf-8") as log:
+        log.write("Command: " + shlex.join(command) + "\n")
+        with subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            **kw,
+        ) as process:
+            for line in process.stdout:
+                print(line, end="", flush=True)
+                log.write(line)
+                log.flush()
+                if first_error is None and diagnostic.search(line):
+                    first_error = line.strip()
+            returncode = process.wait()
+    if returncode:
+        error = subprocess.CalledProcessError(returncode, command)
+        error.add_note("Full native build log: " + str(log_path))
+        if first_error:
+            error.add_note("First compiler/linker diagnostic: " + first_error)
+        raise error
+    return subprocess.CompletedProcess(command, returncode)
 
 
 def checkout(url, rev, path):
@@ -70,10 +106,25 @@ def main():
             "-DVST3_SDK_ROOT=" + str(sdk),
             "-DJSON_ROOT=" + str(js),
             "-DCASSOUND_BUILD_MDA_TESTS=" + ("ON" if args.mda else "OFF"),
-        ]
+        ],
+        log_path=build / "logs" / "configure.log",
     )
     targets = ["cassound-vst3", "cassound-testfx"] + (["mda-vst3"] if args.mda else [])
-    run(["cmake", "--build", build, "--config", "Release", "--target", *targets, "--parallel", "4"])
+    run(
+        [
+            "cmake",
+            "--build",
+            build,
+            "--config",
+            "Release",
+            "--target",
+            *targets,
+            "--parallel",
+            "4",
+            "--verbose",
+        ],
+        log_path=build / "logs" / "build.log",
+    )
     licenses = build / "licenses"
     licenses.mkdir(exist_ok=True)
     shutil.copy2(sdk / "LICENSE.txt", licenses / "VST3-SDK-MIT.txt")

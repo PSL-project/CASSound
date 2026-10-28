@@ -3,6 +3,9 @@ project(CASSoundVST3 VERSION 1.0.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 if(MSVC)
+  # The pinned SDK adds /MD unless its own static-CRT option is enabled.
+  # Keep every SDK library, fixture and host on the same /MT runtime.
+  set(SMTG_USE_STATIC_CRT ON CACHE BOOL "Use the same static CRT throughout the native build" FORCE)
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 if(WIN32 AND NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -31,6 +34,9 @@ add_executable(cassound-vst3 host.cpp ${PLATFORM_MODULE} "${VST3_SDK_ROOT}/publi
 target_include_directories(cassound-vst3 PRIVATE "${VST3_SDK_ROOT}" "${JSON_ROOT}/single_include")
 target_link_libraries(cassound-vst3 PRIVATE sdk_hosting ${CMAKE_DL_LIBS})
 if(WIN32)
+  # objbase.h includes Windows headers: their min/max macros break std::min
+  # in host.cpp unless disabled before any Windows header is processed.
+  target_compile_definitions(cassound-vst3 PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
   target_link_libraries(cassound-vst3 PRIVATE ole32 shell32)
 endif()
 set(public_sdk_SOURCE_DIR "${VST3_SDK_ROOT}/public.sdk")

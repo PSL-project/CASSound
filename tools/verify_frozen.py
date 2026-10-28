@@ -41,11 +41,16 @@ def main():
                 [executable, "--json", *parts],
                 text=True,
                 capture_output=True,
-                check=True,
+                check=False,
                 timeout=180,
                 cwd=root,
                 env=env,
             )
+            if completed.returncode:
+                raise RuntimeError(
+                    f"Frozen command failed (exit {completed.returncode}): {parts}\n"
+                    f"stdout:\n{completed.stdout[-8000:]}\nstderr:\n{completed.stderr[-8000:]}"
+                )
             return json.loads(completed.stdout)
 
         assert run("doctor")["media.native"]["available"]

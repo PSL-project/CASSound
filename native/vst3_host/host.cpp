@@ -11,6 +11,7 @@
 #include "public.sdk/source/vst/hosting/processdata.h"
 #include "public.sdk/source/vst/utility/memoryibstream.h"
 #include "public.sdk/source/vst/utility/stringconvert.h"
+#include <algorithm>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
