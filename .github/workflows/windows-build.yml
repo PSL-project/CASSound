@@ -1,0 +1,58 @@
+name: Windows application and installer
+on: [workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install uv==0.13.4
+      - run: uv sync --frozen --extra full --extra dev
+      - run: choco install ffmpeg innosetup --yes --no-progress
+      - run: uv run --no-sync python tools/build_native.py --fetch
+      - run: uv run --no-sync python tools/native_test_environment.py build/native
+      - run: uv run --no-sync python -m pytest -q
+      - run: uv run --no-sync python tools/fetch_models.py model-packs
+      - run: uv run --no-sync python tools/model_smoke.py model-packs
+      - run: uv run --no-sync python tools/build_release.py --target python
+      - run: uv run --no-sync python tools/build_release.py --target desktop --require-windows
+      - run: uv run --no-sync python tools/build_release.py --target installer --require-windows
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CASSound-windows-x64
+          path: dist/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CASSound-model-packs
+          path: model-packs/*.casp
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CASSound-testfx
+          path: build/native/fixture_bundle/
+  verify:
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: CASSound-windows-x64
+          path: packaged/
+      - uses: actions/download-artifact@v4
+        with:
+          name: CASSound-testfx
+          path: fixture/
+      - uses: actions/download-artifact@v4
+        with:
+          name: CASSound-model-packs
+          path: model-packs/
+      - run: python tools/verify_frozen.py packaged/CASSound/CASSoundCLI.exe --features --p3 --vst3 fixture/cassound-testfx.vst3
+      - run: python tools/verify_release_runtime.py packaged/CASSound/CASSoundCLI.exe --models model-packs
+      - run: packaged/CASSound/CASSound.exe --gui-startup-check
