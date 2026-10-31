@@ -105,7 +105,7 @@ Forensic candidates, profile distances and model scores are observations, not au
 
 The VST3 host supports documented mono/stereo offline audio effects with generic parameters/state, latency/tails and crash quarantine. Instruments, sidechains and vendor editor embedding are outside its current host scope. Audio driver support depends on the installed PortAudio backend.
 
-This source bundle is **1.0.0rc1**. Executed Linux checks and outstanding native Windows, device, DPI/accessibility and field-dataset qualification are recorded explicitly in [RELEASE_VALIDATION.md](docs/RELEASE_VALIDATION.md). Windows CI builds the executable and installer, then verifies the packaged application on a separate runner. Successful compilation alone is not runtime qualification.
+This source bundle is **1.0.0rc1**. Executed Linux checks and outstanding native Windows, device, DPI/accessibility and field-dataset qualification are recorded explicitly in [RELEASE_VALIDATION.md](docs/RELEASE_VALIDATION.md). Windows CI builds the executable and installer, then verifies the packaged application on a separate runner. 
 
 ## Extend and contribute
 
